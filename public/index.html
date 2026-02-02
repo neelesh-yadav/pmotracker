@@ -1065,9 +1065,10 @@
         const userStr = localStorage.getItem('user');
     
         if (!token || !userStr) {
-          console.warn('User not logged in');
+          window.location.href = '/login.html';
           return;
         }
+
     
         currentUser = JSON.parse(userStr);
         updateHeader();
