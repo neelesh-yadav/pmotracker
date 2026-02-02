@@ -253,6 +253,17 @@ app.post('/api/pms', authenticateToken, async (req, res) => {
     });
 
     await pm.save();
+    
+    // ALSO create login account for PM
+    const hashedPassword = await bcrypt.hash('pm123', 10);
+    
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'PM',
+      initials
+    });
     res.status(201).json(pm);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -317,54 +328,29 @@ app.post('/api/resources', authenticateToken, async (req, res) => {
 
 // ============ PROJECT ROUTES ============
 
-app.get('/api/projects', authenticateToken, async (req, res) => {
-  try {
-    let query = {};
-    
-    if (req.user.role === 'PM') {
-      const pm = await ProjectManager.findOne({ email: req.user.email });
-      if (pm) {
-        query._id = { $in: pm.assignedProjects };
-      }
-    }
-
-    const projects = await Project.find(query)
-      .populate('pmId')
-      .populate('resources.resourceId')
-      .populate('dependencies.upstreamId');
-    
-    res.json(projects);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-app.get('/api/projects/:id', authenticateToken, async (req, res) => {
-  try {
-    const project = await Project.findById(req.params.id)
-      .populate('pmId')
-      .populate('resources.resourceId')
-      .populate('dependencies.upstreamId');
-    
-    if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
-    }
-
-    res.json(project);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
 app.post('/api/projects', authenticateToken, async (req, res) => {
   try {
+    // ✅ Only PMO and PM can create projects
+    if (!['PMO', 'PM'].includes(req.user.role)) {
+      return res.status(403).json({ message: 'Not allowed to create project' });
+    }
+
+    // ✅ If PM is creating project, auto-assign project to them
+    if (req.user.role === 'PM') {
+      const pm = await ProjectManager.findOne({ email: req.user.email });
+      if (!pm) {
+        return res.status(400).json({ message: 'PM profile not found' });
+      }
+      req.body.pmId = pm._id;
+    }
+
     const projectCount = await Project.countDocuments();
     const caseId = `PRJ-2026-${String(projectCount + 1).padStart(3, '0')}`;
 
     const project = new Project({
       ...req.body,
       caseId,
-      createdBy: req.user.name || req.user.email
+      createdBy: req.user.email
     });
 
     await project.save();
@@ -379,6 +365,25 @@ app.post('/api/projects', authenticateToken, async (req, res) => {
       .populate('resources.resourceId');
 
     res.status(201).json(populatedProject);
+
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
+app.get('/api/projects/:id', authenticateToken, async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id)
+      .populate('pmId')
+      .populate('resources.resourceId')
+      .populate('dependencies.upstreamId');
+    
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    res.json(project);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
