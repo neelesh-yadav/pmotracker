@@ -139,8 +139,8 @@ app.get('/health', (req, res) => {
 
 // Root route
 app.get('/', (req, res) => {
-  console.log('📄 Serving index.html');
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  console.log('📄 Serving login.html');
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // ============ AUTHENTICATION ROUTES ============
@@ -452,8 +452,17 @@ app.get('/api/stats/dashboard', authenticateToken, async (req, res) => {
 
 app.post('/api/seed', async (req, res) => {
   try {
+    // ✅ Check if PMO already exists
+    const existingPMO = await User.findOne({ role: 'PMO' });
+
+    if (existingPMO) {
+      return res.status(403).json({
+        message: 'Database already initialized. Seeding is disabled.'
+      });
+    }
+
     console.log('🌱 Starting database seed...');
-    
+
     await User.deleteMany({});
     await ProjectManager.deleteMany({});
     await Resource.deleteMany({});
@@ -461,6 +470,7 @@ app.post('/api/seed', async (req, res) => {
 
     console.log('📝 Creating admin user...');
     const hashedPassword = await bcrypt.hash('admin123', 10);
+
     const adminUser = new User({
       name: 'Neelesh Yadav',
       email: 'admin@pmo.com',
@@ -468,6 +478,7 @@ app.post('/api/seed', async (req, res) => {
       role: 'PMO',
       initials: 'NY'
     });
+
     await adminUser.save();
 
     console.log('👥 Creating project managers...');
@@ -497,12 +508,12 @@ app.post('/api/seed', async (req, res) => {
 
     console.log('💼 Creating resources...');
     await Resource.create([
-      { name: 'Sarah Chen', role: 'Senior Developer', email: 'sarah.chen@company.com', plannedCapacity: 40, skills: ['React', 'Node.js', 'AWS'] },
-      { name: 'Marcus Johnson', role: 'Full Stack Developer', email: 'marcus.j@company.com', plannedCapacity: 40, skills: ['Python', 'Django'] },
-      { name: 'Priya Sharma', role: 'UI/UX Designer', email: 'priya.sharma@company.com', plannedCapacity: 40, skills: ['Figma', 'Adobe XD'] },
-      { name: 'David Kim', role: 'DevOps Engineer', email: 'david.kim@company.com', plannedCapacity: 40, skills: ['Docker', 'Kubernetes'] },
-      { name: 'Emma Rodriguez', role: 'QA Engineer', email: 'emma.r@company.com', plannedCapacity: 40, skills: ['Selenium', 'Jest'] },
-      { name: 'James Anderson', role: 'Backend Developer', email: 'james.a@company.com', plannedCapacity: 40, skills: ['Java', 'Spring'] }
+      { name: 'Sarah Chen', role: 'Senior Developer', email: 'sarah.chen@company.com', plannedCapacity: 40 },
+      { name: 'Marcus Johnson', role: 'Full Stack Developer', email: 'marcus.j@company.com', plannedCapacity: 40 },
+      { name: 'Priya Sharma', role: 'UI/UX Designer', email: 'priya.sharma@company.com', plannedCapacity: 40 },
+      { name: 'David Kim', role: 'DevOps Engineer', email: 'david.kim@company.com', plannedCapacity: 40 },
+      { name: 'Emma Rodriguez', role: 'QA Engineer', email: 'emma.r@company.com', plannedCapacity: 40 },
+      { name: 'James Anderson', role: 'Backend Developer', email: 'james.a@company.com', plannedCapacity: 40 }
     ]);
 
     console.log('📊 Creating projects...');
@@ -518,57 +529,15 @@ app.post('/api/seed', async (req, res) => {
       startDate: new Date('2026-01-01'),
       endDate: new Date('2026-04-30'),
       budget: 25000000,
-      spent: 12500000,
       progress: 55,
-      tat: '<1d',
-      createdBy: 'Neelesh Yadav'
-    });
-
-    const project2 = await Project.create({
-      caseId: 'PRJ-2026-002',
-      name: 'API Gateway Migration',
-      pmId: pm2._id,
-      status: 'In Progress',
-      health: 'At Risk',
-      priority: 'Critical',
-      type: 'Infrastructure',
-      branch: 'Engineering',
-      startDate: new Date('2025-12-01'),
-      endDate: new Date('2026-03-31'),
-      budget: 35000000,
-      spent: 20000000,
-      progress: 45,
-      tat: '2d',
-      createdBy: 'Neelesh Yadav'
-    });
-
-    const project3 = await Project.create({
-      caseId: 'PRJ-2026-003',
-      name: 'Mobile App v2.0',
-      pmId: pm3._id,
-      status: 'Planning',
-      health: 'On Track',
-      priority: 'High',
-      type: 'Product',
-      branch: 'Mobile',
-      startDate: new Date('2026-02-01'),
-      endDate: new Date('2026-07-31'),
-      budget: 50000000,
-      spent: 0,
-      progress: 10,
-      tat: '<1d',
-      createdBy: 'Neelesh Yadav'
+      createdBy: 'System'
     });
 
     pm1.assignedProjects.push(project1._id);
-    pm2.assignedProjects.push(project2._id);
-    pm3.assignedProjects.push(project3._id);
-    
     await pm1.save();
-    await pm2.save();
-    await pm3.save();
 
     console.log('✅ Database seeded successfully!');
+
     res.json({
       message: 'Database seeded successfully',
       adminCredentials: {
@@ -576,6 +545,7 @@ app.post('/api/seed', async (req, res) => {
         password: 'admin123'
       }
     });
+
   } catch (error) {
     console.error('❌ Seed error:', error);
     res.status(500).json({ message: 'Seed error', error: error.message });
