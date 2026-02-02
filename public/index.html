@@ -900,7 +900,7 @@
       </div>
       
       <!-- Project Managers Tab -->
-      <div id="pmsTab" class="tab-content hidden">
+      <div id="pmsTabContent" class="tab-content hidden">
         <div class="page-header">
           <div>
             <h2 class="page-title">Project Managers</h2>
@@ -1060,63 +1060,62 @@
     
     // Initialize
     async function init() {
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('user');
-      
-      if (!token || !userStr) {
-        window.location.href = '/';
-        return;
-      }
-      
       try {
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+    
+        if (!token || !userStr) {
+          console.warn('User not logged in');
+          return;
+        }
+    
         currentUser = JSON.parse(userStr);
         updateHeader();
+    
         await loadAllData();
-      } catch (e) {
-        console.error('Initialization error:', e);
-        handleLogout();
+      } catch (error) {
+        console.error('Init failed:', error);
       }
     }
+
     
     function updateHeader() {
-      document.getElementById('headerUserName').textContent = currentUser.name;
-      document.getElementById('headerUserRole').textContent = currentUser.role;
-      document.getElementById('headerUserAvatar').textContent = currentUser.initials;
-      
-      // Show/hide PM tab based on role
-      if (currentUser.role !== 'PMO') {
+      document.getElementById('headerUserName').textContent = currentUser.name || '';
+      document.getElementById('headerUserRole').textContent = currentUser.role || '';
+      document.getElementById('headerUserAvatar').textContent = currentUser.initials || '';
+    
+      const role = currentUser.role?.toUpperCase().trim();
+    
+      // Show PM tab only for PMO
+      if (role !== 'PMO') {
         document.getElementById('pmsTab').style.display = 'none';
       }
-      
-      // Hide New Project button for Team/Stakeholder
-      if (currentUser.role === 'Team' || currentUser.role === 'Stakeholder') {
+    
+      // Hide New Project button for Team / Stakeholder
+      if (role === 'TEAM' || role === 'STAKEHOLDER') {
         document.getElementById('btnNewProject').style.display = 'none';
       }
     }
+
     
     async function loadAllData() {
       try {
-        const [projectsData, pmsData, resourcesData, statsData] = await Promise.all([
-          apiRequest('/projects'),
-          apiRequest('/pms'),
-          apiRequest('/resources'),
-          apiRequest('/stats/dashboard')
-        ]);
-        
-        projects = projectsData;
-        projectManagers = pmsData;
-        resources = resourcesData;
-        stats = statsData;
-        
+        const projectsData = await apiRequest('/projects');
+        const pmsData = await apiRequest('/pms').catch(() => []);
+        const resourcesData = await apiRequest('/resources').catch(() => []);
+        const statsData = await apiRequest('/stats/dashboard').catch(() => ({}));
+    
+        projects = projectsData || [];
+        projectManagers = pmsData || [];
+        resources = resourcesData || [];
+        stats = statsData || {};
+    
         renderCurrentTab();
       } catch (error) {
-        console.error('Failed to load data:', error);
-        if (error.message.includes('token')) {
-          handleLogout();
-        }
+        console.error('Data loading failed:', error);
       }
     }
-    
+
     function renderCurrentTab() {
       switch(currentTab) {
         case 'queue':
@@ -1148,7 +1147,8 @@
       document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.add('hidden');
       });
-      document.getElementById(tab + 'Tab').classList.remove('hidden');
+      document.getElementById(tab === 'pms' ? 'pmsTabContent' : tab + 'Tab')
+        .classList.remove('hidden');
       
       renderCurrentTab();
     }
@@ -1169,8 +1169,8 @@
       const priorityFilter = document.getElementById('filterPriority').value;
       
       let filtered = projects.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm) || 
-                             p.caseId.toLowerCase().includes(searchTerm);
+        const matchesSearch = p.name?.toLowerCase().includes(searchTerm) || 
+                             p.caseId?.toLowerCase().includes(searchTerm);
         const matchesStatus = !statusFilter || p.status === statusFilter;
         const matchesPriority = !priorityFilter || p.priority === priorityFilter;
         return matchesSearch && matchesStatus && matchesPriority;
@@ -1305,7 +1305,7 @@
       
       grid.innerHTML = projectManagers.map(pm => {
         const assignedProjects = projects.filter(p => 
-          pm.assignedProjects.some(apId => apId === p._id || apId.toString() === p._id.toString())
+          (pm.assignedProjects || []).some(   apId => apId === p._id || apId?.toString() === p._id.toString() )
         );
         const inProgress = assignedProjects.filter(p => p.status === 'In Progress').length;
         
@@ -1321,7 +1321,7 @@
             </div>
             <div class="pm-stats">
               <div>
-                <div class="pm-stat-value">${pm.assignedProjects.length}</div>
+                <div class="pm-stat-value">${(pm.assignedProjects || []).length}</div>
                 <div class="pm-stat-label">TOTAL</div>
               </div>
               <div>
@@ -1480,7 +1480,7 @@
             </div>
           </div>
         </div>
-        ${currentUser.role === 'PMO' ? `
+        ${currentUser.role?.toUpperCase().trim() === 'PMO' ? `
           <div class="modal-footer">
             <button class="btn-danger" onclick="deleteProject('${project._id}')">
               <span>🗑️</span>
@@ -1558,12 +1558,23 @@
       document.getElementById('filterPriority').value = '';
       renderProjects();
     }
-    
+
+    let sortConfig = { field: null, asc: true };
     function sortTable(field) {
-      // Implement sorting logic
+      sortConfig.asc = sortConfig.field === field ? !sortConfig.asc : true;
+      sortConfig.field = field;
+      projects.sort((a, b) => {
+        if (!a[field]) return 1;
+        if (!b[field]) return -1;
+    
+        if (a[field] < b[field]) return sortConfig.asc ? -1 : 1;
+        if (a[field] > b[field]) return sortConfig.asc ? 1 : -1;
+        return 0;
+      });
+
       renderProjects();
     }
-    
+
     async function loadProjects() {
       await loadAllData();
     }
