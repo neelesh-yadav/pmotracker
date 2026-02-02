@@ -371,6 +371,31 @@ app.post('/api/projects', authenticateToken, async (req, res) => {
   }
 });
 
+// ✅ GET ALL PROJECTS (FOR DASHBOARD)
+app.get('/api/projects', authenticateToken, async (req, res) => {
+  try {
+    let query = {};
+
+    // PM sees only own projects
+    if (req.user.role === 'PM') {
+      const pm = await ProjectManager.findOne({ email: req.user.email });
+      if (pm) {
+        query._id = { $in: pm.assignedProjects };
+      }
+    }
+
+    const projects = await Project.find(query)
+      .populate('pmId')
+      .populate('resources.resourceId');
+
+    res.json(projects);
+  } catch (error) {
+    console.error('Get projects error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
 
 app.get('/api/projects/:id', authenticateToken, async (req, res) => {
   try {
