@@ -160,13 +160,12 @@
         // ✅ VERY IMPORTANT (DO NOT CHANGE)
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Go to dashboard
-        window.location.href = '/index.html';
-
-      } catch (err) {
-        showError(err.message);
-      }
+        
+        if (data.user.forcePasswordReset) {
+          window.location.href = '/reset-password.html';
+        } else {
+          window.location.href = '/index.html';
+        }
     }
 
     function showError(msg) {
