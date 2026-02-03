@@ -1,3 +1,7 @@
+const User = require('./models/User');
+const ProjectManager = require('./models/ProjectManager');
+const Resource = require('./models/Resource');
+const Project = require('./models/Project');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
