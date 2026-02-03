@@ -132,7 +132,7 @@
   <script>
     const API_URL = window.location.origin + '/api';
 
-    async function login() {
+    window.login = async function login() {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const errorBox = document.getElementById('loginError');
