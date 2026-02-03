@@ -130,50 +130,57 @@
   </div>
 
   <script>
-    const API_URL = window.location.origin + '/api';
+  const API_URL = window.location.origin + '/api';
 
-    window.login = async function login() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errorBox = document.getElementById('loginError');
+  // ✅ helper function (TOP LEVEL)
+  function showError(msg) {
+    const box = document.getElementById('loginError');
+    box.textContent = msg;
+    box.style.display = 'block';
+  }
 
-      errorBox.style.display = 'none';
+  // ✅ make login globally visible
+  window.login = async function () {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorBox = document.getElementById('loginError');
 
-      if (!email || !password) {
-        showError('Please enter email and password');
-        return;
+    errorBox.style.display = 'none';
+
+    if (!email || !password) {
+      showError('Please enter email and password');
+      return;
+    }
+
+    try {
+      const res = await fetch(API_URL + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Login failed');
       }
 
-      try {
-        const res = await fetch(API_URL + '/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
+      // ✅ save login info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-        const data = await res.json();
+      // ✅ force reset if needed
+      if (data.user.forcePasswordReset) {
+        window.location.href = '/reset-password.html';
+      } else {
+        window.location.href = '/index.html';
+      }
 
-        if (!res.ok) {
-          throw new Error(data.message || 'Login failed');
-        }
-
-        // ✅ VERY IMPORTANT (DO NOT CHANGE)
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        if (data.user.forcePasswordReset) {
-          window.location.href = '/reset-password.html';
-        } else {
-          window.location.href = '/index.html';
-        }
+    } catch (err) {
+      showError(err.message);
     }
-
-    function showError(msg) {
-      const box = document.getElementById('loginError');
-      box.textContent = msg;
-      box.style.display = 'block';
-    }
-  </script>
+  };
+</script>
 
 </body>
 </html>
