@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, enum: ['PMO', 'PM', 'Team', 'Stakeholder'], default: 'PM' },
   initials: String,
   phone: String,
+  forcePasswordReset: { type: Boolean, default: true }
   createdAt: { type: Date, default: Date.now }
 });
 
