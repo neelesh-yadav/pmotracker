@@ -1,5 +1,5 @@
 const User = require('./models/User');
-const ProjectManager = require('./models/ProjectManager');
+const ProjectManager = require('./models/Projectmanager');
 const Resource = require('./models/Resource');
 const Project = require('./models/Project');
 const express = require('express');
