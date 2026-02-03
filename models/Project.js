@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const ProjectSchema = new mongoose.Schema({
-  caseId: { type: String, unique: true },
-  name: { type: String, required: true },
-  pmId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProjectManager', required: true },
+  caseId: String,
+  name: String,
+  pmId: { type: mongoose.Schema.Types.ObjectId, ref: 'ProjectManager' },
   status: String,
   health: String,
   priority: String,
@@ -14,6 +14,16 @@ const ProjectSchema = new mongoose.Schema({
   budget: Number,
   spent: Number,
   progress: Number,
+
+  resources: [
+    {
+      resourceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Resource' },
+      allocation: Number,
+      actualEffort: Number,
+      role: String
+    }
+  ],
+
   createdBy: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: Date
