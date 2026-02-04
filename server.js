@@ -1,5 +1,5 @@
-const taskRoutes = require('./routes/task');
-const riskRoutes = require('./routes/risk');
+const taskRoutes = require('./routes/task.routes');
+const riskRoutes = require('./routes/risk.routes');
 const authenticateToken = require('./middleware/auth');
 const User = require('./models/User');
 const ProjectManager = require('./models/Projectmanager');
