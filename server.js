@@ -1,3 +1,5 @@
+const taskRoutes = require('./routes/task');
+const riskRoutes = require('./routes/risk');
 const authenticateToken = require('./middleware/auth');
 const User = require('./models/User');
 const ProjectManager = require('./models/Projectmanager');
@@ -19,6 +21,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use('/api/tasks', taskRoutes);
+app.use('/api/risks', riskRoutes);
 
 console.log('🔧 Starting PMO Tracker Server...');
 console.log('📂 Serving static files from public/ directory');
