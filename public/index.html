@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PMO Project Tracker - Enterprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>PMO Project Tracker v3.0</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -15,7 +17,6 @@
     :root {
       --primary: #8B1538;
       --primary-dark: #6d0f2a;
-      --primary-light: #a91d44;
       --success: #34c759;
       --warning: #ff9500;
       --danger: #dc2626;
@@ -31,7 +32,7 @@
     }
     
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--gray-100);
       color: var(--gray-900);
       min-height: 100vh;
@@ -57,29 +58,43 @@
       gap: 0.75rem;
     }
     
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-    }
-    
     .logo-text h1 {
       font-size: 1.1rem;
       font-weight: 700;
       color: var(--primary);
-      letter-spacing: -0.5px;
     }
     
     .logo-text p {
       font-size: 0.7rem;
       color: var(--gray-500);
       text-transform: uppercase;
-      letter-spacing: 1px;
     }
     
     .user-section {
       display: flex;
       align-items: center;
       gap: 1rem;
+    }
+    
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+    
+    .notification-count {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .user-name {
@@ -99,54 +114,35 @@
     .user-avatar {
       width: 36px;
       height: 36px;
-      background: var(--primary);
       border-radius: 50%;
+      background: var(--primary);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
       font-weight: 600;
-      font-size: 0.85rem;
     }
     
-    .btn-logout {
-      padding: 0.5rem 1rem;
-      background: transparent;
-      border: 1px solid var(--gray-300);
-      color: var(--gray-900);
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
-    
-    .btn-logout:hover {
-      background: var(--gray-100);
-    }
-    
-    /* Navigation */
+    /* Navigation Tabs */
     .nav-tabs {
       background: white;
-      border-bottom: 1px solid var(--gray-200);
       padding: 0 2rem;
+      border-bottom: 1px solid var(--gray-200);
       display: flex;
-      gap: 0.5rem;
+      gap: 1rem;
     }
     
     .nav-tab {
       padding: 1rem 1.5rem;
-      background: transparent;
-      border: none;
-      border-bottom: 3px solid transparent;
-      color: var(--gray-500);
-      font-size: 0.95rem;
-      font-weight: 500;
       cursor: pointer;
+      border-bottom: 2px solid transparent;
+      color: var(--gray-500);
+      font-weight: 500;
       transition: all 0.2s;
     }
     
     .nav-tab:hover {
-      color: var(--gray-900);
+      color: var(--primary);
     }
     
     .nav-tab.active {
@@ -155,44 +151,74 @@
     }
     
     /* Main Content */
-    .main-content {
+    .main-container {
       padding: 2rem;
-      max-width: 1600px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+    .view-section {
+      display: none;
+    }
+    
+    .view-section.active {
+      display: block;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
       margin-bottom: 2rem;
     }
     
-    .page-title {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--gray-200);
     }
     
-    .page-subtitle {
-      font-size: 0.95rem;
+    .stat-label {
+      font-size: 0.85rem;
       color: var(--gray-500);
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+    
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
     }
     
     /* Buttons */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
     .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
       background: var(--primary);
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
     }
     
     .btn-primary:hover {
@@ -200,158 +226,26 @@
     }
     
     .btn-secondary {
-      padding: 0.75rem 1.25rem;
-      background: white;
+      background: var(--gray-200);
       color: var(--gray-900);
-      border: 1px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
     }
     
     .btn-danger {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      background: white;
-      color: var(--danger);
-      border: 1px solid var(--danger);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
+      background: var(--danger);
+      color: white;
     }
     
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    
-    .stat-card {
-      background: white;
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
-    }
-    
-    .stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    
-    .stat-label {
-      font-size: 0.75rem;
-      color: var(--gray-500);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-    
-    .stat-green { color: var(--success); }
-    .stat-orange { color: var(--warning); }
-    .stat-red { color: var(--danger); }
-    .stat-blue { color: var(--info); }
-    
-    /* Filters Bar */
-    .filters-bar {
-      background: white;
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .filters-label {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    
-    .search-box {
-      flex: 1;
-      max-width: 300px;
-      position: relative;
-    }
-    
-    .search-input {
-      width: 100%;
-      padding: 0.65rem 0.75rem 0.65rem 2.5rem;
-      border: 1px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-    
-    .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gray-400);
-    }
-    
-    .filter-select {
-      padding: 0.65rem 0.75rem;
-      border: 1px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      background: white;
-    }
-    
-    .btn-clear {
-      padding: 0.65rem 1rem;
-      background: transparent;
-      color: var(--primary);
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
     }
     
     /* Table */
-    .table-container {
+    .data-table {
       background: white;
-      border: 1px solid var(--gray-200);
       border-radius: 12px;
+      border: 1px solid var(--gray-200);
       overflow: hidden;
-    }
-    
-    .table-header {
-      background: #f9f2f4;
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--gray-200);
-    }
-    
-    .table-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
-    
-    .btn-refresh {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: white;
-      border: 1px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
     }
     
     table {
@@ -359,1240 +253,570 @@
       border-collapse: collapse;
     }
     
-    th {
-      text-align: left;
-      padding: 1rem 1.5rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--primary);
-      text-transform: uppercase;
-      cursor: pointer;
+    thead {
       background: var(--gray-50);
-      user-select: none;
     }
     
-    th:hover {
-      background: var(--gray-100);
+    th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--gray-600);
     }
     
-    tr {
-      border-bottom: 1px solid var(--gray-100);
-      cursor: pointer;
-      transition: background 0.2s;
+    td {
+      padding: 1rem;
+      border-top: 1px solid var(--gray-200);
     }
     
     tr:hover {
       background: var(--gray-50);
     }
     
-    td {
-      padding: 1rem 1.5rem;
-      font-size: 0.9rem;
-    }
-    
-    /* Badges */
-    .badge {
-      display: inline-block;
-      padding: 0.35rem 0.75rem;
+    /* Status Badges */
+    .status-badge {
+      padding: 0.25rem 0.75rem;
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 600;
+      display: inline-block;
     }
     
-    .badge-success {
-      background: #d1f4e0;
-      color: #0c6b39;
-    }
+    .status-on-track { background: #d1fae5; color: #065f46; }
+    .status-at-risk { background: #fed7aa; color: #92400e; }
+    .status-critical { background: #fee2e2; color: #991b1b; }
+    .status-completed { background: #dbeafe; color: #1e40af; }
     
-    .badge-warning {
-      background: #fff4e6;
-      color: #e67700;
-    }
-    
-    .badge-danger {
-      background: #ffe0e0;
-      color: #c41e3a;
-    }
-    
-    .badge-info {
-      background: #e6f0ff;
-      color: #0056b3;
-    }
-    
-    .badge-priority-critical {
-      background: #ffe0e0;
-      color: #c41e3a;
-    }
-    
-    .badge-priority-high {
-      background: #fff4e6;
-      color: #e67700;
-    }
-    
-    .badge-priority-medium {
-      background: #e6f0ff;
-      color: #0056b3;
-    }
-    
-    .badge-priority-low {
-      background: var(--gray-100);
-      color: var(--gray-500);
-    }
+    .priority-critical { background: #fee2e2; color: #991b1b; }
+    .priority-high { background: #fed7aa; color: #92400e; }
+    .priority-medium { background: #fef3c7; color: #78350f; }
+    .priority-low { background: #e0e7ff; color: #3730a3; }
     
     /* Modal */
-    .modal-overlay {
+    .modal {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0, 0, 0, 0.5);
-      display: none;
+      z-index: 1000;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
-      padding: 2rem;
     }
     
-    .modal-overlay.active {
+    .modal.active {
       display: flex;
     }
     
     .modal-content {
       background: white;
-      border-radius: 16px;
-      width: 100%;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 90%;
       max-width: 600px;
       max-height: 90vh;
       overflow-y: auto;
-      position: relative;
-    }
-    
-    .modal-content.large {
-      max-width: 900px;
     }
     
     .modal-header {
-      padding: 2rem;
-      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
     }
     
     .modal-title {
       font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
+      font-weight: 700;
     }
     
-    .modal-subtitle {
-      font-size: 0.9rem;
-      color: var(--gray-500);
-    }
-    
-    .btn-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      width: 36px;
-      height: 36px;
-      background: var(--gray-100);
-      border: none;
-      border-radius: 8px;
+    .close-modal {
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      color: var(--gray-600);
-    }
-    
-    .modal-body {
-      padding: 2rem;
-    }
-    
-    .modal-footer {
-      padding: 1.5rem 2rem;
-      border-top: 1px solid var(--gray-200);
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-    }
-    
-    /* Form */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-    }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .form-group-full {
-      grid-column: 1 / -1;
-    }
-    
-    label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--gray-900);
-    }
-    
-    input, select, textarea {
-      padding: 0.75rem;
-      border: 1px solid var(--gray-300);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-family: inherit;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-    
-    /* PM Cards */
-    .pm-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 1.5rem;
-    }
-    
-    .pm-card {
-      background: white;
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      padding: 1.5rem;
-    }
-    
-    .pm-header {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    
-    .pm-avatar {
-      width: 60px;
-      height: 60px;
-      background: var(--primary);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-    }
-    
-    .pm-info h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .pm-info p {
-      font-size: 0.85rem;
-      color: var(--gray-500);
-      margin-bottom: 0.25rem;
-    }
-    
-    .pm-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--gray-100);
-      text-align: center;
-    }
-    
-    .pm-stat-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-    }
-    
-    .pm-stat-label {
-      font-size: 0.75rem;
-      color: var(--gray-500);
-    }
-    
-    .pm-projects h4 {
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-    }
-    
-    .pm-project-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    
-    .pm-project-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem;
-      background: #fafafa;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-    
-    .empty-state {
-      padding: 3rem;
-      text-align: center;
-      color: var(--gray-500);
-    }
-    
-    /* Utilities */
-    .hidden {
-      display: none !important;
-    }
-    
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 60vh;
       font-size: 1.5rem;
       color: var(--gray-500);
     }
     
-    .error-message {
-      padding: 1rem;
-      background: #ffe0e0;
-      color: #c41e3a;
-      border-radius: 8px;
-      margin-bottom: 1rem;
+    /* Form */
+    .form-group {
+      margin-bottom: 1.5rem;
     }
     
-    .success-message {
-      padding: 1rem;
-      background: #d1f4e0;
-      color: #0c6b39;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-    
-    /* Resource Table */
-    .utilization-bar {
-      flex: 1;
-      height: 8px;
-      background: var(--gray-100);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    .utilization-fill {
-      height: 100%;
-      border-radius: 10px;
-      transition: width 0.3s;
-    }
-    
-    .utilization-container {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    
-    .utilization-percent {
-      font-size: 0.85rem;
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
       font-weight: 600;
-      min-width: 45px;
+      font-size: 0.9rem;
     }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state-text {
+      color: var(--gray-500);
+      font-size: 1.1rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-header { padding: 0 1rem; height: 60px; }
+      .main-container { padding: 1rem; }
+      .stats-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .nav-tabs { padding: 0 1rem; overflow-x: auto; }
+      .action-bar { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .modal-content { width: 95%; padding: 1.5rem; }
+      .data-table { overflow-x: auto; }
+      table { min-width: 600px; }
+    }
+    
+    /* Loading */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--gray-300);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <!-- App Container -->
-  <div id="app">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-section">
-        <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
-          <path d="M16 2L4 8L16 14L28 8L16 2Z" fill="#8B1538" stroke="#8B1538" stroke-width="2"/>
-          <path d="M4 14L16 20L28 14" stroke="#8B1538" stroke-width="2" fill="none"/>
-          <path d="M4 20L16 26L28 20" stroke="#8B1538" stroke-width="2" fill="none"/>
-        </svg>
-        <div class="logo-text">
-          <h1>PMO TRACKER</h1>
-          <p>PROJECT MANAGEMENT</p>
-        </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo-section">
+      <div class="logo-text">
+        <h1>PMO PROJECT TRACKER</h1>
+        <p>v3.0 Enhanced</p>
       </div>
-      <div class="user-section">
-        <span class="user-name" id="headerUserName"></span>
-        <div class="user-badge" id="headerUserRole"></div>
-        <div class="user-avatar" id="headerUserAvatar"></div>
-        <button class="btn-logout" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="user-section">
+      <div class="notification-bell" onclick="loadNotifications()">
+        🔔
+        <span class="notification-count" id="notificationCount">0</span>
       </div>
-    </header>
+      <span class="user-name" id="userName">Loading...</span>
+      <span class="user-badge" id="userRole">...</span>
+      <div class="user-avatar" id="userAvatar">?</div>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <div class="nav-tab active" onclick="switchView('dashboard')">Dashboard</div>
+    <div class="nav-tab" onclick="switchView('projects')">Projects</div>
+    <div class="nav-tab" onclick="switchView('tasks')">My Tasks</div>
+    <div class="nav-tab" onclick="switchView('resources')" id="resourcesTab">Resources</div>
+    <div class="nav-tab" onclick="switchView('users')" id="usersTab" style="display:none">Users & PMs</div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="main-container">
     
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
-      <button class="nav-tab active" data-tab="queue" onclick="switchTab('queue')">Project Queue</button>
-      <button class="nav-tab" data-tab="capacity" onclick="switchTab('capacity')">Capacity Planning</button>
-      <button class="nav-tab" data-tab="pms" onclick="switchTab('pms')" id="pmsTab">Project Managers</button>
-    </nav>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Project Queue Tab -->
-      <div id="queueTab" class="tab-content">
-        <div class="page-header">
-          <div>
-            <h2 class="page-title">Project Queue</h2>
-            <p class="page-subtitle">Manage and review project portfolio</p>
-          </div>
-          <button class="btn-primary" onclick="openAddProjectModal()" id="btnNewProject">
-            <span>+</span>
-            <span>New Project</span>
-          </button>
+    <!-- Dashboard View -->
+    <div class="view-section active" id="dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-label">Total Projects</div>
+          <div class="stat-value" id="totalProjects">0</div>
         </div>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="statTotal">0</div>
-            <div class="stat-label">TOTAL</div>
-          </div>
-          <div class="stat-card stat-green">
-            <div class="stat-value" id="statApproved">0</div>
-            <div class="stat-label">APPROVED</div>
-          </div>
-          <div class="stat-card stat-orange">
-            <div class="stat-value" id="statPending">0</div>
-            <div class="stat-label">PENDING</div>
-          </div>
-          <div class="stat-card stat-red">
-            <div class="stat-value" id="statRejected">0</div>
-            <div class="stat-label">REJECTED</div>
-          </div>
-          <div class="stat-card stat-blue">
-            <div class="stat-value" id="statActual">0</div>
-            <div class="stat-label">ACTUAL</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statBreach">0</div>
-            <div class="stat-label">BREACH</div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" id="inProgressProjects">0</div>
         </div>
-        
-        <div class="filters-bar">
-          <div class="filters-label">Filters:</div>
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search Case ID or Project Name...">
-          </div>
-          <select class="filter-select" id="filterStatus">
-            <option value="">All Status</option>
-            <option value="Planning">Planning</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-          <select class="filter-select" id="filterPriority">
-            <option value="">All Priority</option>
-            <option value="Critical">Critical</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-          <button class="btn-clear" onclick="clearFilters()">Clear</button>
+        <div class="stat-card">
+          <div class="stat-label">My Tasks</div>
+          <div class="stat-value" id="myTasksCount">0</div>
         </div>
-        
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Project Queue (<span id="projectCount">0</span> projects)</h3>
-            <button class="btn-refresh" onclick="loadProjects()">
-              <span>🔄</span>
-              <span>Refresh</span>
-            </button>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th onclick="sortTable('caseId')">CASE ID</th>
-                <th onclick="sortTable('name')">PROJECT NAME</th>
-                <th>PM</th>
-                <th>AMOUNT</th>
-                <th onclick="sortTable('startDate')">STARTED</th>
-                <th>TYPE</th>
-                <th>STATUS</th>
-                <th>PRIORITY</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="projectsTableBody">
-              <tr>
-                <td colspan="9" class="empty-state">Loading projects...</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="stat-card">
+          <div class="stat-label">Active Risks</div>
+          <div class="stat-value" id="activeRisks">0</div>
         </div>
       </div>
       
-      <!-- Capacity Planning Tab -->
-      <div id="capacityTab" class="tab-content hidden">
-        <div class="page-header">
-          <div>
-            <h2 class="page-title">Resource Capacity Planning</h2>
-            <p class="page-subtitle">Monitor resource utilization and availability</p>
-          </div>
+      <h2 class="section-title" style="margin-bottom: 1rem;">Recent Projects</h2>
+      <div class="data-table" id="recentProjectsTable"></div>
+    </div>
+
+    <!-- Projects View -->
+    <div class="view-section" id="projects">
+      <div class="action-bar">
+        <h2 class="section-title">All Projects</h2>
+        <button class="btn btn-primary" onclick="openProjectModal()">+ New Project</button>
+      </div>
+      <div class="data-table" id="projectsTable"></div>
+    </div>
+
+    <!-- Tasks View -->
+    <div class="view-section" id="tasks">
+      <div class="action-bar">
+        <h2 class="section-title">My Tasks</h2>
+        <div>
+          <button class="btn btn-primary" onclick="openTaskModal()" id="createTaskBtn">+ New Task</button>
         </div>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="totalResources">0</div>
-            <div class="stat-label">TOTAL RESOURCES</div>
-          </div>
-          <div class="stat-card stat-green">
-            <div class="stat-value" id="optimalResources">0</div>
-            <div class="stat-label">OPTIMAL</div>
-          </div>
-          <div class="stat-card stat-orange">
-            <div class="stat-value" id="underUtilized">0</div>
-            <div class="stat-label">UNDER-UTILIZED</div>
-          </div>
-          <div class="stat-card stat-red">
-            <div class="stat-value" id="overAllocated">0</div>
-            <div class="stat-label">OVER-ALLOCATED</div>
-          </div>
-          <div class="stat-card stat-blue">
-            <div class="stat-value" id="avgUtilization">0%</div>
-            <div class="stat-label">AVG UTILIZATION</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="availableCapacity">0h</div>
-            <div class="stat-label">AVAILABLE</div>
-          </div>
-        </div>
-        
-        <div class="table-container">
-          <div class="table-header">
-            <h3 class="table-title">Resource Utilization</h3>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>NAME</th>
-                <th>ROLE</th>
-                <th>EMAIL</th>
-                <th>CAPACITY</th>
-                <th>ALLOCATION</th>
-                <th>UTILIZATION</th>
-                <th>AVAILABLE</th>
-                <th>STATUS</th>
-              </tr>
-            </thead>
-            <tbody id="resourcesTableBody">
-              <tr>
-                <td colspan="8" class="empty-state">Loading resources...</td>
-              </tr>
-            </tbody>
-          </table>
+      </div>
+      <div class="data-table" id="tasksTable"></div>
+    </div>
+
+    <!-- Resources View -->
+    <div class="view-section" id="resources">
+      <div class="action-bar">
+        <h2 class="section-title">Resources</h2>
+        <button class="btn btn-primary" onclick="openResourceModal()" id="createResourceBtn">+ Add Resource</button>
+      </div>
+      <div class="data-table" id="resourcesTable"></div>
+    </div>
+
+    <!-- Users View (PMO Only) -->
+    <div class="view-section" id="users">
+      <div class="action-bar">
+        <h2 class="section-title">Users & Project Managers</h2>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn btn-primary" onclick="openUserModal()">+ Add User</button>
+          <button class="btn btn-primary" onclick="openPMModal()">+ Add PM</button>
         </div>
       </div>
       
-      <!-- Project Managers Tab -->
-      <div id="pmsTabContent" class="tab-content hidden">
-        <div class="page-header">
-          <div>
-            <h2 class="page-title">Project Managers</h2>
-            <p class="page-subtitle">Manage PM assignments and workload</p>
-          </div>
-          <button class="btn-primary" onclick="openAddPMModal()">
-            <span>+</span>
-            <span>Add PM</span>
-          </button>
-        </div>
-        
-        <div class="pm-grid" id="pmGrid">
-          <div class="empty-state">Loading project managers...</div>
-        </div>
-      </div>
-    </main>
+      <h3 style="margin: 2rem 0 1rem 0;">Project Managers</h3>
+      <div class="data-table" id="pmsTable"></div>
+      
+      <h3 style="margin: 2rem 0 1rem 0;">All Users</h3>
+      <div class="data-table" id="allUsersTable"></div>
+    </div>
+
   </div>
-  
-  <!-- Add Project Modal -->
-  <div id="addProjectModal" class="modal-overlay">
+
+  <!-- Project Modal -->
+  <div class="modal" id="projectModal">
     <div class="modal-content">
-      <button class="btn-close" onclick="closeAddProjectModal()">×</button>
       <div class="modal-header">
-        <h2 class="modal-title">Add New Project</h2>
-        <p class="modal-subtitle">Create a new project and assign to a Project Manager</p>
+        <h3 class="modal-title">Project Details</h3>
+        <span class="close-modal" onclick="closeModal('projectModal')">&times;</span>
       </div>
-      <div class="modal-body">
-        <div id="projectFormError" class="error-message hidden"></div>
-        <form id="addProjectForm" class="form-grid">
-          <div class="form-group form-group-full">
-            <label>Project Name *</label>
-            <input type="text" id="projectName" required placeholder="Enter project name">
+      
+      <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <button class="btn btn-secondary" onclick="showProjectTab('details')">Details</button>
+        <button class="btn btn-secondary" onclick="showProjectTab('tasks')">Tasks</button>
+        <button class="btn btn-secondary" onclick="showProjectTab('risks')">Risks</button>
+        <button class="btn btn-secondary" onclick="showProjectTab('issues')">Issues</button>
+      </div>
+      
+      <div id="projectDetailsTab">
+        <form id="projectForm">
+          <input type="hidden" id="projectId">
+          <div class="form-group">
+            <label class="form-label">Project Name</label>
+            <input type="text" class="form-input" id="projectName" required>
           </div>
           <div class="form-group">
-            <label>Project Manager *</label>
-            <select id="projectPM" required>
-              <option value="">Select PM</option>
-            </select>
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="projectDescription"></textarea>
           </div>
           <div class="form-group">
-            <label>Priority</label>
-            <select id="projectPriority">
+            <label class="form-label">Priority</label>
+            <select class="form-select" id="projectPriority">
               <option value="Low">Low</option>
-              <option value="Medium" selected>Medium</option>
+              <option value="Medium">Medium</option>
               <option value="High">High</option>
               <option value="Critical">Critical</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Type</label>
-            <select id="projectType">
-              <option value="Internal">Internal</option>
-              <option value="Infrastructure">Infrastructure</option>
-              <option value="Product">Product</option>
-              <option value="Compliance">Compliance</option>
+            <label class="form-label">Status</label>
+            <select class="form-select" id="projectStatus">
+              <option value="Draft">Draft</option>
+              <option value="Planning">Planning</option>
+              <option value="In_Progress">In Progress</option>
+              <option value="On_Hold">On Hold</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Branch</label>
-            <select id="projectBranch">
-              <option value="Technology">Technology</option>
-              <option value="Engineering">Engineering</option>
-              <option value="Mobile">Mobile</option>
-              <option value="Data">Data</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Budget (Crores)</label>
-            <input type="number" id="projectBudget" step="0.01" placeholder="0.00">
-          </div>
-          <div class="form-group">
-            <label>Start Date</label>
-            <input type="date" id="projectStartDate">
-          </div>
-          <div class="form-group">
-            <label>End Date</label>
-            <input type="date" id="projectEndDate">
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Project</button>
           </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeAddProjectModal()">Cancel</button>
-        <button class="btn-primary" onclick="submitProject()">Add Project</button>
+      
+      <div id="projectTasksTab" style="display:none;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+          <h4>Project Tasks</h4>
+          <button class="btn btn-primary btn-sm" onclick="openTaskModal(currentProjectId)">+ Add Task</button>
+        </div>
+        <div id="projectTasksList"></div>
+      </div>
+      
+      <div id="projectRisksTab" style="display:none;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+          <h4>Project Risks</h4>
+          <button class="btn btn-primary btn-sm" onclick="openRiskModal(currentProjectId)">+ Add Risk</button>
+        </div>
+        <div id="projectRisksList"></div>
+      </div>
+      
+      <div id="projectIssuesTab" style="display:none;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+          <h4>Project Issues</h4>
+          <button class="btn btn-primary btn-sm" onclick="openIssueModal(currentProjectId)">+ Add Issue</button>
+        </div>
+        <div id="projectIssuesList"></div>
       </div>
     </div>
   </div>
-  
-  <!-- Add PM Modal -->
-  <div id="addPMModal" class="modal-overlay">
+
+  <!-- Task Modal -->
+  <div class="modal" id="taskModal">
     <div class="modal-content">
-      <button class="btn-close" onclick="closeAddPMModal()">×</button>
       <div class="modal-header">
-        <h2 class="modal-title">Add Project Manager</h2>
-        <p class="modal-subtitle">Add a new PM to your organization</p>
+        <h3 class="modal-title">Task Details</h3>
+        <span class="close-modal" onclick="closeModal('taskModal')">&times;</span>
       </div>
-      <div class="modal-body">
-        <div id="pmFormError" class="error-message hidden"></div>
-        <form id="addPMForm" class="form-grid">
-          <div class="form-group form-group-full">
-            <label>Full Name *</label>
-            <input type="text" id="pmName" required placeholder="Enter full name">
-          </div>
-          <div class="form-group">
-            <label>Email *</label>
-            <input type="email" id="pmEmail" required placeholder="email@company.com">
-          </div>
-          <div class="form-group">
-            <label>Phone</label>
-            <input type="tel" id="pmPhone" placeholder="+1-234-567-8900">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeAddPMModal()">Cancel</button>
-        <button class="btn-primary" onclick="submitPM()">Add PM</button>
-      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId">
+        <input type="hidden" id="taskProjectId">
+        <div class="form-group">
+          <label class="form-label">Project</label>
+          <select class="form-select" id="taskProject" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Task Title</label>
+          <input type="text" class="form-input" id="taskTitle" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="taskDescription"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assign To</label>
+          <select class="form-select" id="taskAssignedTo"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="taskPriority">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="taskStatus">
+            <option value="To_Do">To Do</option>
+            <option value="In_Progress">In Progress</option>
+            <option value="In_Review">In Review</option>
+            <option value="Blocked">Blocked</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input type="date" class="form-input" id="taskDueDate">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('taskModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Task</button>
+        </div>
+      </form>
     </div>
   </div>
-  
-  <!-- Project Details Modal -->
-  <div id="projectDetailsModal" class="modal-overlay">
-    <div class="modal-content large">
-      <button class="btn-close" onclick="closeProjectDetailsModal()">×</button>
-      <div id="projectDetailsContent"></div>
+
+  <!-- Risk Modal -->
+  <div class="modal" id="riskModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Risk Details</h3>
+        <span class="close-modal" onclick="closeModal('riskModal')">&times;</span>
+      </div>
+      <form id="riskForm">
+        <input type="hidden" id="riskProjectId">
+        <div class="form-group">
+          <label class="form-label">Risk Title</label>
+          <input type="text" class="form-input" id="riskTitle" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="riskDescription"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="riskCategory">
+            <option value="Technical">Technical</option>
+            <option value="Financial">Financial</option>
+            <option value="Resource">Resource</option>
+            <option value="Schedule">Schedule</option>
+            <option value="External">External</option>
+            <option value="Operational">Operational</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Probability</label>
+          <select class="form-select" id="riskProbability">
+            <option value="Very_Low">Very Low</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Very_High">Very High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Impact</label>
+          <select class="form-select" id="riskImpact">
+            <option value="Very_Low">Very Low</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Very_High">Very High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mitigation Plan</label>
+          <textarea class="form-textarea" id="riskMitigationPlan"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('riskModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Risk</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <script>
-    const API_URL = window.location.origin + '/api';
-    let currentUser = null;
-    let projects = [];
-    let projectManagers = [];
-    let resources = [];
-    let stats = {};
-    let currentTab = 'queue';
-    
-    // API Helper
-    async function apiRequest(endpoint, options = {}) {
-      const token = localStorage.getItem('token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` })
-      };
-
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Request failed');
-      }
-
-      return response.json();
-    }
-    
-    // Initialize
-    async function init() {
-      try {
-        const token = localStorage.getItem('token');
-        const userStr = localStorage.getItem('user');
-    
-        if (!token || !userStr) {
-          window.location.href = '/login.html';
-          return;
-        }
-
-    
-        currentUser = JSON.parse(userStr);
-        updateHeader();
-    
-        await loadAllData();
-      } catch (error) {
-        console.error('Init failed:', error);
-      }
-    }
-
-    
-    function updateHeader() {
-      document.getElementById('headerUserName').textContent = currentUser.name || '';
-      document.getElementById('headerUserRole').textContent = currentUser.role || '';
-      document.getElementById('headerUserAvatar').textContent = currentUser.initials || '';
-    
-      const role = currentUser.role?.toUpperCase().trim();
-    
-      // Show PM tab only for PMO
-      if (role !== 'PMO') {
-        document.getElementById('pmsTab').style.display = 'none';
-      }
-    
-      // Hide New Project button for Team / Stakeholder
-      if (role === 'TEAM' || role === 'STAKEHOLDER') {
-        document.getElementById('btnNewProject').style.display = 'none';
-      }
-    }
-
-    
-    async function loadAllData() {
-      try {
-        const projectsData = await apiRequest('/projects');
-        const pmsData = await apiRequest('/pms').catch(() => []);
-        const resourcesData = await apiRequest('/resources').catch(() => []);
-        const statsData = await apiRequest('/stats/dashboard').catch(() => ({}));
-    
-        projects = projectsData || [];
-        projectManagers = pmsData || [];
-        resources = resourcesData || [];
-        stats = statsData || {};
-    
-        renderCurrentTab();
-      } catch (error) {
-        console.error('Data loading failed:', error);
-      }
-    }
-
-    function renderCurrentTab() {
-      switch(currentTab) {
-        case 'queue':
-          renderProjects();
-          renderStats();
-          break;
-        case 'capacity':
-          renderResources();
-          renderCapacityStats();
-          break;
-        case 'pms':
-          renderPMs();
-          break;
-      }
-    }
-    
-    function switchTab(tab) {
-      currentTab = tab;
-      
-      // Update tab buttons
-      document.querySelectorAll('.nav-tab').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.tab === tab) {
-          btn.classList.add('active');
-        }
-      });
-      
-      // Show/hide content
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
-      });
-      document.getElementById(tab === 'pms' ? 'pmsTabContent' : tab + 'Tab')
-        .classList.remove('hidden');
-      
-      renderCurrentTab();
-    }
-    
-    function renderStats() {
-      document.getElementById('statTotal').textContent = stats.total || 0;
-      document.getElementById('statApproved').textContent = stats.approved || 0;
-      document.getElementById('statPending').textContent = stats.pending || 0;
-      document.getElementById('statRejected').textContent = stats.rejected || 0;
-      document.getElementById('statActual').textContent = stats.actual || 0;
-      document.getElementById('statBreach').textContent = stats.breach || 0;
-    }
-    
-    function renderProjects() {
-      const tbody = document.getElementById('projectsTableBody');
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const statusFilter = document.getElementById('filterStatus').value;
-      const priorityFilter = document.getElementById('filterPriority').value;
-      
-      let filtered = projects.filter(p => {
-        const matchesSearch = p.name?.toLowerCase().includes(searchTerm) || 
-                             p.caseId?.toLowerCase().includes(searchTerm);
-        const matchesStatus = !statusFilter || p.status === statusFilter;
-        const matchesPriority = !priorityFilter || p.priority === priorityFilter;
-        return matchesSearch && matchesStatus && matchesPriority;
-      });
-      
-      document.getElementById('projectCount').textContent = filtered.length;
-      
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No projects found</td></tr>';
-        return;
-      }
-      
-      tbody.innerHTML = filtered.map(project => `
-        <tr onclick="showProjectDetails('${project._id}')">
-          <td>${project.caseId}</td>
-          <td style="font-weight: 600;">${project.name}</td>
-          <td>${project.pmId?.name || 'Unassigned'}</td>
-          <td>Rs ${(project.budget / 100000).toFixed(2)} Cr</td>
-          <td>${formatDate(project.startDate)}</td>
-          <td>${project.type}</td>
-          <td>${getStatusBadge(project.status)}</td>
-          <td>${getPriorityBadge(project.priority)}</td>
-          <td>⋮</td>
-        </tr>
-      `).join('');
-    }
-    
-    function renderCapacityStats() {
-      let totalCapacity = 0;
-      let totalAllocation = 0;
-      let optimal = 0;
-      let underUtilized = 0;
-      let overAllocated = 0;
-      
-      resources.forEach(resource => {
-        const util = calculateResourceUtilization(resource);
-        totalCapacity += util.planned;
-        totalAllocation += util.actual;
-        
-        if (util.utilization > 100) overAllocated++;
-        else if (util.utilization < 60) underUtilized++;
-        else optimal++;
-      });
-      
-      const avgUtil = totalCapacity > 0 ? Math.round((totalAllocation / totalCapacity) * 100) : 0;
-      const available = Math.max(0, totalCapacity - totalAllocation);
-      
-      document.getElementById('totalResources').textContent = resources.length;
-      document.getElementById('optimalResources').textContent = optimal;
-      document.getElementById('underUtilized').textContent = underUtilized;
-      document.getElementById('overAllocated').textContent = overAllocated;
-      document.getElementById('avgUtilization').textContent = avgUtil + '%';
-      document.getElementById('availableCapacity').textContent = available + 'h';
-    }
-    
-    function calculateResourceUtilization(resource) {
-      let totalAllocation = 0;
-      projects.forEach(project => {
-        if (project.status !== 'Completed' && project.status !== 'Cancelled') {
-          const assignment = project.resources?.find(r => r.resourceId?._id === resource._id);
-          if (assignment) {
-            totalAllocation += assignment.allocation || 0;
-          }
-        }
-      });
-      
-      return {
-        planned: resource.plannedCapacity,
-        actual: totalAllocation,
-        utilization: (totalAllocation / resource.plannedCapacity) * 100,
-        available: resource.plannedCapacity - totalAllocation
-      };
-    }
-    
-    function renderResources() {
-      const tbody = document.getElementById('resourcesTableBody');
-      
-      if (resources.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No resources found</td></tr>';
-        return;
-      }
-      
-      tbody.innerHTML = resources.map(resource => {
-        const util = calculateResourceUtilization(resource);
-        const percentage = Math.round(util.utilization);
-        let status = 'Optimal';
-        let statusClass = 'badge-warning';
-        let barColor = '#ff9500';
-        
-        if (percentage > 100) {
-          status = 'Over-allocated';
-          statusClass = 'badge-danger';
-          barColor = '#dc2626';
-        } else if (percentage < 60) {
-          status = 'Under-utilized';
-          statusClass = 'badge-info';
-          barColor = '#007aff';
-        } else {
-          statusClass = 'badge-success';
-          barColor = '#34c759';
-        }
-        
-        return `
-          <tr>
-            <td style="font-weight: 600;">${resource.name}</td>
-            <td>${resource.role}</td>
-            <td>${resource.email}</td>
-            <td>${util.planned}h/week</td>
-            <td>${util.actual}h/week</td>
-            <td>
-              <div class="utilization-container">
-                <div class="utilization-bar">
-                  <div class="utilization-fill" style="width: ${Math.min(percentage, 100)}%; background: ${barColor};"></div>
-                </div>
-                <span class="utilization-percent">${percentage}%</span>
-              </div>
-            </td>
-            <td>${util.available}h</td>
-            <td><span class="badge ${statusClass}">${status}</span></td>
-          </tr>
-        `;
-      }).join('');
-    }
-    
-    function renderPMs() {
-      const grid = document.getElementById('pmGrid');
-      
-      if (projectManagers.length === 0) {
-        grid.innerHTML = '<div class="empty-state">No project managers found. Click "Add PM" to get started.</div>';
-        return;
-      }
-      
-      grid.innerHTML = projectManagers.map(pm => {
-        const assignedProjects = projects.filter(p => 
-          (pm.assignedProjects || []).some(   apId => apId === p._id || apId?.toString() === p._id.toString() )
-        );
-        const inProgress = assignedProjects.filter(p => p.status === 'In Progress').length;
-        
-        return `
-          <div class="pm-card">
-            <div class="pm-header">
-              <div class="pm-avatar">${pm.initials}</div>
-              <div class="pm-info">
-                <h3>${pm.name}</h3>
-                <p>${pm.email}</p>
-                <p>${pm.phone || 'N/A'}</p>
-              </div>
-            </div>
-            <div class="pm-stats">
-              <div>
-                <div class="pm-stat-value">${(pm.assignedProjects || []).length}</div>
-                <div class="pm-stat-label">TOTAL</div>
-              </div>
-              <div>
-                <div class="pm-stat-value">${inProgress}</div>
-                <div class="pm-stat-label">IN PROGRESS</div>
-              </div>
-            </div>
-            <div class="pm-projects">
-              <h4>Assigned Projects</h4>
-              ${assignedProjects.length > 0 ? `
-                <div class="pm-project-list">
-                  ${assignedProjects.map(p => `
-                    <div class="pm-project-item">
-                      <span>${p.name}</span>
-                      ${getStatusBadge(p.status)}
-                    </div>
-                  `).join('')}
-                </div>
-              ` : '<div class="empty-state" style="padding: 2rem;">No projects assigned</div>'}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-    
-    // Modals
-    function openAddProjectModal() {
-      const select = document.getElementById('projectPM');
-      select.innerHTML = '<option value="">Select PM</option>' + 
-        projectManagers.map(pm => `<option value="${pm._id}">${pm.name}</option>`).join('');
-      
-      document.getElementById('addProjectModal').classList.add('active');
-    }
-    
-    function closeAddProjectModal() {
-      document.getElementById('addProjectModal').classList.remove('active');
-      document.getElementById('addProjectForm').reset();
-      document.getElementById('projectFormError').classList.add('hidden');
-    }
-    
-    async function submitProject() {
-      const name = document.getElementById('projectName').value;
-      const pmId = document.getElementById('projectPM').value;
-      const priority = document.getElementById('projectPriority').value;
-      const type = document.getElementById('projectType').value;
-      const branch = document.getElementById('projectBranch').value;
-      const budget = document.getElementById('projectBudget').value;
-      const startDate = document.getElementById('projectStartDate').value;
-      const endDate = document.getElementById('projectEndDate').value;
-      
-      if (!name || !pmId) {
-        showError('projectFormError', 'Please fill in required fields');
-        return;
-      }
-      
-      try {
-        await apiRequest('/projects', {
-          method: 'POST',
-          body: JSON.stringify({
-            name,
-            pmId,
-            priority,
-            type,
-            branch,
-            budget: parseFloat(budget) * 100000 || 0,
-            startDate: startDate || new Date().toISOString(),
-            endDate: endDate || new Date(Date.now() + 90*24*60*60*1000).toISOString(),
-            status: 'Planning',
-            health: 'On Track'
-          })
-        });
-        
-        await loadAllData();
-        closeAddProjectModal();
-        alert('Project created successfully!');
-      } catch (error) {
-        showError('projectFormError', error.message);
-      }
-    }
-    
-    function openAddPMModal() {
-      document.getElementById('addPMModal').classList.add('active');
-    }
-    
-    function closeAddPMModal() {
-      document.getElementById('addPMModal').classList.remove('active');
-      document.getElementById('addPMForm').reset();
-      document.getElementById('pmFormError').classList.add('hidden');
-    }
-    
-    async function submitPM() {
-      const name = document.getElementById('pmName').value;
-      const email = document.getElementById('pmEmail').value;
-      const phone = document.getElementById('pmPhone').value;
-      
-      if (!name || !email) {
-        showError('pmFormError', 'Please fill in required fields');
-        return;
-      }
-      
-      try {
-        await apiRequest('/pms', {
-          method: 'POST',
-          body: JSON.stringify({ name, email, phone })
-        });
-        
-        await loadAllData();
-        closeAddPMModal();
-        alert('Project Manager added successfully!');
-      } catch (error) {
-        showError('pmFormError', error.message);
-      }
-    }
-    
-    function showProjectDetails(projectId) {
-      const project = projects.find(p => p._id === projectId);
-      if (!project) return;
-      
-      const content = document.getElementById('projectDetailsContent');
-      content.innerHTML = `
-        <div class="modal-header">
-          <h2 class="modal-title">${project.name}</h2>
-          <p class="modal-subtitle">${project.caseId}</p>
+  <!-- Resource Modal -->
+  <div class="modal" id="resourceModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Resource</h3>
+        <span class="close-modal" onclick="closeModal('resourceModal')">&times;</span>
+      </div>
+      <form id="resourceForm">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" id="resourceName" required>
         </div>
-        <div class="modal-body">
-          <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-            ${getPriorityBadge(project.priority)}
-            ${getStatusBadge(project.status)}
-            ${getHealthBadge(project.health)}
-          </div>
-          <h3 style="margin-bottom: 1rem;">Project Information</h3>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-            <div>
-              <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">PROJECT MANAGER</div>
-              <div style="font-weight: 600;">${project.pmId?.name || 'Unassigned'}</div>
-            </div>
-            <div>
-              <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">BRANCH</div>
-              <div style="font-weight: 600;">${project.branch}</div>
-            </div>
-            <div>
-              <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">TYPE</div>
-              <div style="font-weight: 600;">${project.type}</div>
-            </div>
-            <div>
-              <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">BUDGET</div>
-              <div style="font-weight: 600;">Rs ${(project.budget / 100000).toFixed(2)} Cr</div>
-            </div>
-            <div>
-              <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">PROGRESS</div>
-              <div style="font-weight: 600;">${project.progress || 0}%</div>
-            </div>
-            <div>
-              <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">START DATE</div>
-              <div style="font-weight: 600;">${formatDate(project.startDate)}</div>
-            </div>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <input type="text" class="form-input" id="resourceRole" required>
         </div>
-        ${currentUser.role?.toUpperCase().trim() === 'PMO' ? `
-          <div class="modal-footer">
-            <button class="btn-danger" onclick="deleteProject('${project._id}')">
-              <span>🗑️</span>
-              <span>Delete Project</span>
-            </button>
-          </div>
-        ` : ''}
-      `;
-      
-      document.getElementById('projectDetailsModal').classList.add('active');
-    }
-    
-    function closeProjectDetailsModal() {
-      document.getElementById('projectDetailsModal').classList.remove('active');
-    }
-    
-    async function deleteProject(projectId) {
-      if (!confirm('Are you sure you want to delete this project?')) return;
-      
-      try {
-        await apiRequest(`/projects/${projectId}`, { method: 'DELETE' });
-        await loadAllData();
-        closeProjectDetailsModal();
-        alert('Project deleted successfully!');
-      } catch (error) {
-        alert('Failed to delete project: ' + error.message);
-      }
-    }
-    
-    // Utilities
-    function showError(elementId, message) {
-      const el = document.getElementById(elementId);
-      el.textContent = message;
-      el.classList.remove('hidden');
-    }
-    
-    function getStatusBadge(status) {
-      const classes = {
-        'Completed': 'badge-success',
-        'In Progress': 'badge-warning',
-        'Planning': 'badge-info',
-        'Cancelled': 'badge-danger'
-      };
-      return `<span class="badge ${classes[status] || 'badge-info'}">${status}</span>`;
-    }
-    
-    function getPriorityBadge(priority) {
-      const classes = {
-        'Critical': 'badge-priority-critical',
-        'High': 'badge-priority-high',
-        'Medium': 'badge-priority-medium',
-        'Low': 'badge-priority-low'
-      };
-      return `<span class="badge ${classes[priority] || 'badge-priority-medium'}">${priority}</span>`;
-    }
-    
-    function getHealthBadge(health) {
-      const classes = {
-        'On Track': 'badge-success',
-        'At Risk': 'badge-danger',
-        'Delayed': 'badge-danger'
-      };
-      return `<span class="badge ${classes[health] || 'badge-success'}">${health}</span>`;
-    }
-    
-    function formatDate(dateStr) {
-      if (!dateStr) return 'N/A';
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-GB');
-    }
-    
-    function clearFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('filterPriority').value = '';
-      renderProjects();
-    }
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="resourceEmail" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Planned Capacity (hours/week)</label>
+          <input type="number" class="form-input" id="resourceCapacity" value="40">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('resourceModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    let sortConfig = { field: null, asc: true };
-    function sortTable(field) {
-      sortConfig.asc = sortConfig.field === field ? !sortConfig.asc : true;
-      sortConfig.field = field;
-      projects.sort((a, b) => {
-        if (!a[field]) return 1;
-        if (!b[field]) return -1;
-    
-        if (a[field] < b[field]) return sortConfig.asc ? -1 : 1;
-        if (a[field] > b[field]) return sortConfig.asc ? 1 : -1;
-        return 0;
-      });
+  <!-- User Modal -->
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add User</h3>
+        <span class="close-modal" onclick="closeModal('userModal')">&times;</span>
+      </div>
+      <form id="userForm">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" id="userName" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="userEmail" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-select" id="userRole">
+            <option value="Team_Member">Team Member</option>
+            <option value="Stakeholder">Stakeholder</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input type="text" class="form-input" id="userDepartment">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-      renderProjects();
-    }
+  <!-- PM Modal -->
+  <div class="modal" id="pmModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Project Manager</h3>
+        <span class="close-modal" onclick="closeModal('pmModal')">&times;</span>
+      </div>
+      <form id="pmForm">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" id="pmName" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="pmEmail" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-input" id="pmPhone">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('pmModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create PM</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    async function loadProjects() {
-      await loadAllData();
-    }
-    
-    function handleLogout() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/';
-    }
-    
-    // Event Listeners
-    document.getElementById('searchInput').addEventListener('input', renderProjects);
-    document.getElementById('filterStatus').addEventListener('change', renderProjects);
-    document.getElementById('filterPriority').addEventListener('change', renderProjects);
-    
-    // Initialize on load
-    init();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
