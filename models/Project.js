@@ -6,6 +6,17 @@ const ProjectSchema = new mongoose.Schema({
   description: String,
   pmId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   sponsorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  resources: [
+    {
+      resourceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      role: String,
+      allocation: Number
+    }
+  ],
   
   status: { 
     type: String, 
